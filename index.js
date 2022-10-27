@@ -1,5 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+
+// const DATABSE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 
 const publicRoutes = require("./routes/public");
 const staffRoutes = require("./routes/staff");
