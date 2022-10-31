@@ -1,9 +1,10 @@
 const express = require("express");
-const { create } = require("../controllers/CategoryController");
+const { create, updateCategory, deleteCategory, listAll } = require("../controllers/CategoryController");
 const router = express.Router();
 
 router.post("/create", create);
-router.post("/edit", create);
-router.post("/delete", create);
+router.post("/update", updateCategory);
+router.post("/delete", deleteCategory);
+router.get("/all", listAll);
 
 module.exports = router;
