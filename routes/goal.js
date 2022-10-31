@@ -1,10 +1,10 @@
 const express = require("express");
-const { create } = require("../controllers/GoalController");
+const { create, updateGoal, deleteGoal } = require("../controllers/GoalController");
 const router = express.Router();
 
 router.post("/create", create);
-router.post("/edit", create);
-router.post("/delete", create);
-router.post("/complete", create);
+router.post("/update", updateGoal);
+router.post("/delete", deleteGoal);
+// router.post("/complete", create);
 
 module.exports = router;
