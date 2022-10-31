@@ -1,11 +1,11 @@
 const express = require("express");
-const { create, login } = require("../controllers/UserController");
+const { create, login, validateStaff, addStaff } = require("../controllers/UserController");
 const router = express.Router();
 
 router.post("/create", create);
 router.post("/login", login);
-router.post("/activate-as-manager", create);
-router.post("/edit", create);
+router.post("/staff.validate", validateStaff);
+router.post("/manager/staff.add", addStaff);
 router.post("/logout", create);
 
 module.exports = router;
