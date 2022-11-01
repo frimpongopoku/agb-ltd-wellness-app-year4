@@ -9,6 +9,7 @@ const GoalSchema = new Schema(
     dueBy: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
     done: { type: Boolean, default: false },
+    owner: String,
     categories: { type: Object, default: [] },
   },
   { timestamps: { updatedAt: true } }

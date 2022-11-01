@@ -7,7 +7,7 @@ const { appResponse } = require("./misc/objects");
  * @param {*} res
  */
 const create = async (req, res) => {
-  const { title, description, categories, dueBy } = req.body || {};
+  const { title, description, categories, dueBy, owner } = req.body || {};
 
   if (!dueBy)
     return appResponse({
@@ -22,7 +22,7 @@ const create = async (req, res) => {
     });
 
   try {
-    const goal = await Goal.create({ title, description, categories, dueBy });
+    const goal = await Goal.create({ title, description, categories, dueBy, owner });
     res.status(201).send(appResponse({ data: goal }));
   } catch (e) {
     appResponse({ res, error: e?.toString() });
@@ -47,7 +47,7 @@ const updateGoal = async (req, res) => {
     new: true,
   });
 
-  if (!response || !response.ok)
+  if (!response)
     return appResponse({
       res,
       error: `Sorry, could not update any goal with id: ${id} `,
@@ -80,8 +80,23 @@ const deleteGoal = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+
+const listForStaff = async (req, res) => {
+  const { user_id } = req.body || {};
+  if (!user_id)
+    appResponse({ res, error: "Provide a user_id to load goals for" });
+
+  try {
+    const goals = await Goal.find({ owner: user_id });
+
+    return appResponse({ res, data: goals });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
+};
 module.exports = {
   create,
   updateGoal,
   deleteGoal,
+  listForStaff
 };

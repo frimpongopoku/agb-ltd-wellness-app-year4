@@ -6,6 +6,5 @@ router.post("/create", create);
 router.post("/login", login);
 router.post("/staff.validate", validateStaff);
 router.post("/manager/staff.add", addStaff);
-router.post("/logout", create);
 
 module.exports = router;
