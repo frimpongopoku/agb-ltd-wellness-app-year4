@@ -138,7 +138,7 @@ const addStaff = async (req, res) => {
   return appResponse({ res, data: user });
 };
 module.exports = {
-  create,
+  createStaff: create,
   login,
   validateStaff,
   addStaff,
