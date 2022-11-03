@@ -35,8 +35,10 @@ const STAFF_CODES = [
   "W8B6-DP25-HN4C-3E8M",
   "42R7-HST8-WAZ4-QRZ9",
 ];
+const TOKEN_EXPIRED  = "TokenExpiredError"
 module.exports = {
   ROLES,
   MANAGER_CODES,
   STAFF_CODES,
+  TOKEN_EXPIRED
 };
