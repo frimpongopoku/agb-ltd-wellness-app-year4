@@ -1,4 +1,5 @@
 const JWT = require("jsonwebtoken");
+const { appResponse } = require("../controllers/misc/objects");
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
 const createAccessToken = (userId, expiresIn = "1h") => {
@@ -8,7 +9,6 @@ const createAccessToken = (userId, expiresIn = "1h") => {
     issuer: "wellness.agb-company-limited.org",
     expiresIn,
   };
-
   return new Promise((resolve, reject) => {
     JWT.sign(payload, ACCESS_TOKEN_SECRET, options, (err, token) => {
       if (err) reject(err);
@@ -25,10 +25,10 @@ const getAccessTokenFromHeader = (headers) => {
 
 const verifyAccessToken = (token) => {
   try {
-    const decoded = JWT.verify(token, ACCESS_TOKEN_SECRET);
-    return decoded;
+    const decoded = JWT.verify(token || "", ACCESS_TOKEN_SECRET);
+    return { isValid: true, payload: decoded };
   } catch (error) {
-    return error;
+    return { isValid: false, message: "User is not authenticated!" };
   }
 };
 
