@@ -5,7 +5,7 @@ const { ROLES, MANAGER_CODES, STAFF_CODES } = require("./misc/constants");
 const { emailIsValid } = require("../utils/utils");
 
 /**
- * Mainly for Staff members who already have a code to register on the platform
+ * Mainly for Managers who already have a code to register on the platform
  * @param {*} req
  * @param {*} res
  * @returns
@@ -138,7 +138,7 @@ const addStaff = async (req, res) => {
   return appResponse({ res, data: user });
 };
 module.exports = {
-  createStaff: create,
+  registerManager: create,
   login,
   validateStaff,
   addStaff,
