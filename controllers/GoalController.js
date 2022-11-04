@@ -22,7 +22,13 @@ const create = async (req, res) => {
     });
 
   try {
-    const goal = await Goal.create({ title, description, categories, dueBy, owner });
+    const goal = await Goal.create({
+      title,
+      description,
+      categories,
+      dueBy,
+      owner,
+    });
     res.status(201).send(appResponse({ data: goal }));
   } catch (e) {
     appResponse({ res, error: e?.toString() });
@@ -82,12 +88,13 @@ const deleteGoal = async (req, res) => {
 };
 
 const listForStaff = async (req, res) => {
-  const { user_id } = req.body || {};
-  if (!user_id)
+  const { userId } = req.body || {};
+
+  if (!userId)
     appResponse({ res, error: "Provide a user_id to load goals for" });
 
   try {
-    const goals = await Goal.find({ owner: user_id });
+    const goals = await Goal.find({ owner: userId });
 
     return appResponse({ res, data: goals });
   } catch (e) {
@@ -98,5 +105,5 @@ module.exports = {
   create,
   updateGoal,
   deleteGoal,
-  listForStaff
+  listForStaff,
 };

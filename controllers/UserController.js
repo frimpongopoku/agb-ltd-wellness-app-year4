@@ -3,6 +3,7 @@ const { appResponse } = require("./misc/objects");
 const hasher = require("bcrypt");
 const { ROLES, MANAGER_CODES, STAFF_CODES } = require("./misc/constants");
 const { emailIsValid } = require("../utils/utils");
+const { createAccessToken } = require("../middlewares/utils");
 
 /**
  * Mainly for Managers who already have a code to register on the platform
@@ -64,7 +65,11 @@ const login = async (req, res) => {
     const passwordIsRight = await hasher.compare(password, user.password);
     if (!passwordIsRight)
       return res.send(appResponse({ error: "Password is incorrect!" }));
-    return es.send(appResponse({ data: user }));
+
+    // Create an access token for 7days
+    const token = await createAccessToken(user._id?.toString(), "7d");
+    res.cookie("_token", token);
+    return res.send(appResponse({ data: user }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
   }
@@ -137,9 +142,15 @@ const addStaff = async (req, res) => {
     return appResponse({ res, error: "Sorry, we could not add staff member" });
   return appResponse({ res, data: user });
 };
+
+const logout = (req, res) => {
+  res.clearCookie("_token");
+  appResponse({ res, data: "Signed out successfully!" });
+};
 module.exports = {
   registerManager: create,
   login,
   validateStaff,
   addStaff,
+  logout
 };
