@@ -66,9 +66,10 @@ const login = async (req, res) => {
     if (!passwordIsRight)
       return res.send(appResponse({ error: "Password is incorrect!" }));
 
+    const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
-    res.cookie("_token", token);
+    res.cookie("_token", token, { maxAge: ONE_WEEK });
     return res.send(appResponse({ data: user }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -152,5 +153,5 @@ module.exports = {
   login,
   validateStaff,
   addStaff,
-  logout
+  logout,
 };
