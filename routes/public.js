@@ -8,7 +8,13 @@ const {
   showLandingPage,
   show404,
   showLoginPage,
+  showCategoriesView,
+  showGoalsView,
 } = require("../controllers/ViewController");
+const {
+  authenticatedUserIsStaff,
+  authenticatedUserIsManager,
+} = require("../middlewares");
 
 const router = express.Router();
 
@@ -18,7 +24,13 @@ router.post("/user/staff.validate", validateStaff);
 
 // ------------------ VIEWS ----------------------
 router.get("/", showLandingPage);
-router.get("/login", showLoginPage);
+router.get("/view/login", showLoginPage);
+router.get("/view/staff/goals", authenticatedUserIsStaff, showGoalsView);
+router.get(
+  "/view/manager/categories/",
+  authenticatedUserIsManager,
+  showCategoriesView
+);
 router.get("*", show404);
 
 module.exports = router;

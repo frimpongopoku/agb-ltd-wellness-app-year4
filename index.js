@@ -9,6 +9,7 @@ const { connectToMongoDB } = require("./utils/utils");
 const {
   authenticatedUserIsManager,
   authenticatedUserIsStaff,
+  setHeaders,
 } = require("./middlewares");
 
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use(STATIC_PATH);
 
 // ---------------- DECLARING MIDDLEWARE -----------------
+
+app.use("/", setHeaders);
 app.use("/manager", authenticatedUserIsManager);
 app.use("/staff", authenticatedUserIsStaff);
 

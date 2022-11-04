@@ -14,8 +14,17 @@ const show404 = (_, res) => {
   res.sendFile(`${PATH}/pages/errors/404.html`);
 };
 
+const showCategoriesView = (_, res) => {
+  res.sendFile(`${PATH}/pages/category.html`);
+};
+const showGoalsView = (_, res) => {
+  res.sendFile(`${PATH}/pages/goal.html`);
+};
+
 module.exports = {
   showLandingPage,
   showLoginPage,
   show404,
+  showCategoriesView,
+  showGoalsView,
 };

@@ -21,9 +21,11 @@ const userIsAuthenticated = async (req, res, next) => {
 };
 
 const authenticatedUserIsStaff = async (req, res, next) => {
+  const { htmlResponse } = req.body;
   const token = verifyAuthentication(req);
   if (!token.isValid)
     return appResponse({
+      htmlResponse,
       res,
       error: token.message,
       status: 401, // Unauthorized
@@ -37,6 +39,7 @@ const authenticatedUserIsStaff = async (req, res, next) => {
     );
     if (!isStaff)
       return appResponse({
+        htmlResponse,
         res,
         status: 403, // Forbidden
         error:
@@ -45,13 +48,15 @@ const authenticatedUserIsStaff = async (req, res, next) => {
     req.body.userId = userId;
     next();
   } catch (e) {
-    appResponse({ res, error: e?.toString() });
+    appResponse({ res, htmlResponse, error: e?.toString() });
   }
 };
 const authenticatedUserIsManager = async (req, res, next) => {
+  const { htmlResponse } = req.body;
   const token = verifyAuthentication(req);
   if (!token.isValid)
     return appResponse({
+      htmlResponse,
       res,
       status: 401, // Unauthorized
       error: token.message,
@@ -65,6 +70,7 @@ const authenticatedUserIsManager = async (req, res, next) => {
     );
     if (!isManager)
       return appResponse({
+        htmlResponse,
         res,
         status: 403, // Forbidden
         error:
@@ -73,12 +79,24 @@ const authenticatedUserIsManager = async (req, res, next) => {
     req.body.userId = userId;
     next();
   } catch (e) {
-    appResponse({ res, error: e?.toString() });
+    appResponse({ res, htmlResponse, error: e?.toString() });
   }
+};
+
+const setHeaders = (req, res, next) => {
+  const isAView = req.url.includes("/view/");
+  if (isAView) {
+    res.setHeader("Content-Type", "text/html");
+    req.body.htmlResponse = true;
+    return next();
+  }
+  res.setHeader("Content-Type", "text/html");
+  next();
 };
 
 module.exports = {
   userIsAuthenticated,
   authenticatedUserIsManager,
   authenticatedUserIsStaff,
+  setHeaders,
 };
