@@ -12,7 +12,6 @@ submitButton.addEventListener("click", function () {
     return (error.style.display = "block");
   }
 
-  console.log("Started running request");
   fetch("/user/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -21,9 +20,11 @@ submitButton.addEventListener("click", function () {
     .then((response) => response.json())
     .then((response) => {
       const user = response.data;
-      const isManager = user.roles?.find(
+      if (!response.success) return console.log("API ERROR: ", response.error);
+      const isManager = user?.roles?.find(
         (r) => r.key === "xxx-manager-uni-key-xxx"
       );
+
       if (isManager) return (window.location = "/view/manager/categories");
       window.location = "/view/staff/goals";
     })

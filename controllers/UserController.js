@@ -142,9 +142,15 @@ const addStaff = async (req, res) => {
     return appResponse({ res, error: "Sorry, we could not add staff member" });
   return appResponse({ res, data: user });
 };
+
+const logout = (req, res) => {
+  res.clearCookie("_token");
+  appResponse({ res, data: "Signed out successfully!" });
+};
 module.exports = {
   registerManager: create,
   login,
   validateStaff,
   addStaff,
+  logout
 };

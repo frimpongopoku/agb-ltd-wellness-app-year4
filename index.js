@@ -11,7 +11,9 @@ const {
   authenticatedUserIsManager,
   authenticatedUserIsStaff,
   setHeaders,
+  userIsAuthenticated,
 } = require("./middlewares");
+const { logout } = require("./controllers/UserController");
 
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 const STATIC_PATH = express.static(path.join(__dirname, "./public"));
@@ -33,6 +35,8 @@ app.use("/staff", authenticatedUserIsStaff);
 app.use("/staff", staffRoutes);
 app.use("/manager", managerRoutes);
 app.use("/", publicRoutes);
+
+app.use("/logout", userIsAuthenticated, logout);
 
 // ------------------ CREATE LISTENING PORT HERE TO ENTER THE APP --------
 
