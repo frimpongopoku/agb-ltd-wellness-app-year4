@@ -23,6 +23,8 @@ const getAccessTokenFromHeader = (headers) => {
   return token;
 };
 
+
+
 const verifyAccessToken = (token) => {
   try {
     const decoded = JWT.verify(token || "", ACCESS_TOKEN_SECRET);

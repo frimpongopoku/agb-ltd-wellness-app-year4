@@ -1,4 +1,5 @@
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const app = express();
 const publicRoutes = require("./routes/public");
@@ -19,6 +20,7 @@ connectToMongoDB(DATABASE_CONNECTION_LINK);
 
 app.use(express.json());
 app.use(STATIC_PATH);
+app.use(cookieParser());
 
 // ---------------- DECLARING MIDDLEWARE -----------------
 

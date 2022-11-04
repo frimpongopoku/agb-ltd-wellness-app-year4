@@ -4,7 +4,9 @@ const User = require("../models/UserModel");
 const { verifyAccessToken, getAccessTokenFromHeader } = require("./utils");
 
 const verifyAuthentication = (req) => {
-  const accessToken = getAccessTokenFromHeader(req.headers);
+  // Get access token from cookies, or header
+  const accessToken =
+    req.cookies?._token || getAccessTokenFromHeader(req.headers);
   const token = verifyAccessToken(accessToken);
   return token;
 };
@@ -90,7 +92,7 @@ const setHeaders = (req, res, next) => {
     req.body.htmlResponse = true;
     return next();
   }
-  res.setHeader("Content-Type", "text/html");
+  res.setHeader("Content-Type", "application/json");
   next();
 };
 

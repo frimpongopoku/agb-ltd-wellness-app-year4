@@ -11,6 +11,7 @@ const showLoginPage = (_, res) => {
 };
 const show404 = (_, res) => {
   res.status(404);
+  res.setHeader("Content-Type", "text/html");
   res.sendFile(`${PATH}/pages/errors/404.html`);
 };
 

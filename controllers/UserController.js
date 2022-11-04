@@ -65,11 +65,11 @@ const login = async (req, res) => {
     const passwordIsRight = await hasher.compare(password, user.password);
     if (!passwordIsRight)
       return res.send(appResponse({ error: "Password is incorrect!" }));
-    console.log("Log user_id", user._id.toString());
+
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
-
-    return res.send(appResponse({ data: { user, _token: token } }));
+    res.cookie("_token", token);
+    return res.send(appResponse({ data: user }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
   }
