@@ -3,10 +3,40 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./assets/css/index.css" />
+    <link rel="stylesheet" href="./../../assets/css/index.css" />
+    <script src="./../../assets/js/login.js" defer></script>
     <title>AGB - LOGIN PAGE</title>
   </head>
   <body>
-    <h1 style="font-size: 52px">Here is the Login Page</h1>
+    <div style="width: 50%; padding: 20px">
+      <h2 style="text-align: center">LOGIN PAGE</h2>
+      <h5
+        id="error-msg"
+        style="color: brown; text-align: center; display: none"
+      >
+        Error message here
+      </h5>
+      <div>
+        <input
+          placeholder="Enter your agb email..."
+          type="text"
+          id="email"
+          style="width: 100%; padding: 10px; margin-bottom: 10px"
+        />
+        <input
+          placeholder="Enter your password..."
+          type="password"
+          id="password"
+          style="width: 100%; padding: 10px; margin-bottom: 10px"
+        />
+        <button
+          type="submit"
+          id="submit-button"
+          style="width: 100%; padding: 10px; cursor: pointer"
+        >
+          LOG IN
+        </button>
+      </div>
+    </div>
   </body>
 </html>
