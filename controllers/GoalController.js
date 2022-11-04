@@ -89,7 +89,7 @@ const deleteGoal = async (req, res) => {
 
 const listForStaff = async (req, res) => {
   const { userId } = req.body || {};
-  // console.log("I did find the userid", userId);
+
   if (!userId)
     appResponse({ res, error: "Provide a user_id to load goals for" });
 

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const path = require("path");
 const findFile = (filePath) => {
-  return path.join(__dirname, `/public/${filePath}`);
+  return path.join(__dirname, `../public/${filePath}`);
 };
 const connectToMongoDB = async (dbLink) => {
   console.log("Trying to connect to database...");
