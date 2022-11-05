@@ -37,7 +37,7 @@ app.use("/manager", managerRoutes);
 app.use("/", publicRoutes);
 
 // ---------------------------------------------------------
-app.use("/whoami", userIsAuthenticated,whoAmI)
+app.use("/whoami", userIsAuthenticated, whoAmI);
 app.use("/logout", userIsAuthenticated, logout);
 
 // ------ CREATE LISTENING PORT HERE TO ENTER THE APP --------

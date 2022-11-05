@@ -19,6 +19,8 @@ const userIsAuthenticated = async (req, res, next) => {
       error: token.message,
       status: 401, // Unauthorized
     });
+    
+  req.body.context = token.payload
   next();
 };
 
@@ -48,6 +50,7 @@ const authenticatedUserIsStaff = async (req, res, next) => {
           "The authenticated user needs have staff priviledges use this route",
       });
     req.body.userId = userId;
+    req.body.context = token.payload
     next();
   } catch (e) {
     appResponse({ res, htmlResponse, error: e?.toString() });
@@ -79,6 +82,7 @@ const authenticatedUserIsManager = async (req, res, next) => {
           "The authenticated user needs to have manager priviledges to perform this action",
       });
     req.body.userId = userId;
+    req.body.context = token.payload
     next();
   } catch (e) {
     appResponse({ res, htmlResponse, error: e?.toString() });

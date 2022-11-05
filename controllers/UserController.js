@@ -38,7 +38,9 @@ const create = async (req, res) => {
       roles: [ROLES.STAFF, ROLES.MANAGER],
       verified: true,
     });
-    res.status(201).send(appResponse({ data: user, status: 201 }));
+    var withoutPassword = user.toObject();
+    delete withoutPassword.password;
+    res.status(201).send(appResponse({ data: withoutPassword, status: 201 }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
   }
@@ -76,7 +78,9 @@ const login = async (req, res) => {
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
     res.cookie("_token", token, { maxAge: ONE_WEEK });
-    return res.send(appResponse({ data: user }));
+    var withoutPassword = user.toObject();
+    delete withoutPassword.password; // dont send the user object with password to the fronted. Remove it first
+    return res.send(appResponse({ data: withoutPassword }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
   }
@@ -167,18 +171,29 @@ const logout = (_, res) => {
  * @param {*} res
  */
 const whoAmI = async (req, res) => {
-  const token = verifyAccessToken(req);
-  const userId = token.payload.aud;
+  const { context } = req.body;
+  const userId = context?.aud;
 
   try {
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ _id: userId }).select(["-password"]); // dont add password field when retrieving object, even though its hashed
     const { isManager, isStaff } = getUserRoles(user);
     var goals = [],
       categories = [];
     if (isStaff) goals = await Goal.find({ owner: userId }); // Retrieve all goals that were created by the stafff
     if (isManager) categories = await Category.find(); // simply retreive all categories
 
-    appResponse({ res, data: { user, goals, categories } });
+    appResponse({
+      res,
+      data: {
+        user: {
+          isManager: isManager ? true : false,
+          isStaff: isStaff ? true : false,
+          ...user.toObject(),
+        },
+        goals,
+        categories,
+      },
+    });
   } catch (e) {
     appResponse({ res, error: e?.toString() });
   }
