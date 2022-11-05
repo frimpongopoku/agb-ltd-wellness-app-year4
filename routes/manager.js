@@ -1,5 +1,5 @@
 const express = require("express");
-const { addStaff } = require("../controllers/UserController");
+const { addStaff, listMyStaff } = require("../controllers/UserController");
 const {
   create,
   updateCategory,
@@ -10,6 +10,7 @@ const {
 const router = express.Router();
 
 router.post("/staff.add", addStaff);
+router.get("/staff.mine", listMyStaff); // retrieve staff that a members that have been added by a particular manager
 
 // -------------------CATEGORIES---------------------
 router.post("/category/create", create);

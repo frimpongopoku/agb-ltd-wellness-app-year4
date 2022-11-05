@@ -198,6 +198,25 @@ const whoAmI = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+
+/**
+ * Retrieves all the staff members that a particular manager has added
+ * to the platform
+ * @param {*} req
+ * @param {*} res
+ */
+const listMyStaff = async (req, res) => {
+  const { context } = req.body;
+  const userId = context.aud;
+  try {
+    const staffMembers = await User.find({ creator: userId }).select([
+      "-password",
+    ]);
+    appResponse({ res, data: staffMembers });
+  } catch (e) {
+    appResponse({ res, error: e.toString() });
+  }
+};
 module.exports = {
   registerManager: create,
   login,
@@ -205,4 +224,5 @@ module.exports = {
   addStaff,
   logout,
   whoAmI,
+  listMyStaff,
 };
