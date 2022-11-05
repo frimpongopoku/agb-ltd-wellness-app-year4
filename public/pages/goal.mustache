@@ -4,14 +4,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./../../assets/css/index.css" />
-    <script src="./../../assets/js/app.js" defer></script>
+    {{! <script src="./../../assets/js/app.js" defer></script> }}
     <title>AGB - GOALS PAGE</title>
   </head>
   <body>
     <div style="text-align: center">
       <h1 style="font-size: 52px">
         Welcome
-        <span id="user-name" style="text-decoration: underline">...</span>, to
+        <span id="user-name" style="text-decoration: underline">{{user.firstName}} {{user.lastName}}</span>, to
         the GOALS page
       </h1>
 

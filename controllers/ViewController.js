@@ -1,4 +1,8 @@
 const path = require("path");
+const Category = require("../models/CategoryModel");
+const Goal = require("../models/GoalModel");
+const User = require("../models/UserModel");
+const { appResponse } = require("./misc/objects");
 
 const PATH = path.join(__dirname, `../public`);
 
@@ -12,14 +16,34 @@ const showLoginPage = (_, res) => {
 const show404 = (_, res) => {
   res.status(404);
   res.setHeader("Content-Type", "text/html");
-  res.sendFile(`${PATH}/pages/errors/404.html`);
+  res.render("errors/404");
+  // res.sendFile(`${PATH}/pages/errors/404.html`);
 };
 
-const showCategoriesView = (_, res) => {
-  res.sendFile(`${PATH}/pages/category.html`);
+const showCategoriesView = async (req, res) => {
+  const { context } = req.body;
+  const userId = context.aud;
+  try {
+    const user = await User.findOne({ _id: userId }).select(["-password"]);
+    const categories = await Category.find({ owner: userId });
+    const staffCreated = await User.find({ creator: userId });
+    res.render("category", { user, categories, staff: staffCreated });
+  } catch (e) {
+    res.render("errors/400", { error: e.toString() });
+  }
 };
-const showGoalsView = (_, res) => {
-  res.sendFile(`${PATH}/pages/goal.html`);
+const showGoalsView = async (req, res) => {
+  const { context } = req.body;
+  const userId = context.aud;
+  try {
+    const user = await User.findOne({ _id: userId }).select(["-password"]);
+    const goals = await Goal.find({ owner: userId });
+    res.render("goal", { user, goals });
+  } catch (e) {
+    res.render("errors/400", { error: e.toString() });
+  }
+
+  // res.sendFile(`${PATH}/pages/goal.html`);
 };
 
 module.exports = {

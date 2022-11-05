@@ -6,19 +6,27 @@ const publicRoutes = require("./routes/public");
 const managerRoutes = require("./routes/manager");
 const staffRoutes = require("./routes/staff");
 const path = require("path");
+const mustacheExpress = require("mustache-express");
 const { connectToMongoDB } = require("./utils/utils");
-const {
+const { 
   authenticatedUserIsManager,
   authenticatedUserIsStaff,
   setHeaders,
-  userIsAuthenticated,
+  userIsAuthenticated, 
 } = require("./middlewares");
 const { logout, whoAmI } = require("./controllers/UserController");
 // --------------------------------------------------------
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 const STATIC_PATH = express.static(path.join(__dirname, "./public"));
 
-connectToMongoDB(DATABASE_CONNECTION_LINK);
+connectToMongoDB(DATABASE_CONNECTION_LINK); // Connect to the database
+
+// ------ Registering View Engine ----------------
+app.engine("mustache", mustacheExpress());
+app.set("view engine", "mustache");
+app.set("views", __dirname + "/public/pages");
+
+// ---------------------------------------------
 
 app.use(express.json());
 app.use(STATIC_PATH);
@@ -31,9 +39,20 @@ app.use("/manager", authenticatedUserIsManager);
 app.use("/staff", authenticatedUserIsStaff);
 
 //---------------- ROUTE DECLARATION ----------------------
-
+ 
 app.use("/staff", staffRoutes);
 app.use("/manager", managerRoutes);
+app.use("/view/gbemi", function (req, res) {
+  res.render("test", {
+    title: "ANOTHER TEST",
+    data: [1, 4, 5, 6,2,4,3,34,2],
+    // data: [
+    //   { name: "here", age: 45 },
+    //   { name: "Akwesi", age: 98 },
+    // ],
+  });
+});
+
 app.use("/", publicRoutes);
 
 // ---------------------------------------------------------

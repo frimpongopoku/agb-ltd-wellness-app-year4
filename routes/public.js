@@ -25,6 +25,9 @@ router.post("/user/staff.validate", validateStaff);
 // ------------------ VIEWS ----------------------
 router.get("/", showLandingPage);
 router.get("/view/login", showLoginPage);
+
+
+// ------------- VIEWS THAT REQUIRE AUTHENTICATION --------------------
 router.get("/view/staff/goals", authenticatedUserIsStaff, showGoalsView);
 router.get(
   "/view/manager/categories/",
