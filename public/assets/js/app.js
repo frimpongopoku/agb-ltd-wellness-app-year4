@@ -9,10 +9,33 @@ signOut.addEventListener("click", function () {
   })
     .then((response) => response.json())
     .then((response) => {
-      console.log("here is there sponse", response);
+      console.log("RESPONSNE OBJECT: ", response);
       if (!response.success) return console.log("API ERROR: ", response.error);
 
       window.location = "/view/login";
     })
     .catch((e) => console.log("ERROR: ", e));
 });
+
+/**
+ * When the App loads, this function will be fired to fetch the currently
+ * Authenticated user
+ */
+const fetchAuthenticatedUser = () => {
+  fetch("/whoami", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      if (!response.success) return console.log("API ERROR: ", response.error);
+
+      console.log("Here is the response", response);
+      const user = response.data?.user;
+      const nameBox = document.getElementById("user-name");
+      if (nameBox) nameBox.innerHTML = user.firstName;
+    })
+    .catch((e) => console.log("ERROR: ", e));
+};
+
+fetchAuthenticatedUser();
