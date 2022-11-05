@@ -1,9 +1,14 @@
 const User = require("./../models/UserModel");
-const { appResponse } = require("./misc/objects");
+const { appResponse, getUserRoles } = require("./misc/objects");
 const hasher = require("bcrypt");
 const { ROLES, MANAGER_CODES, STAFF_CODES } = require("./misc/constants");
 const { emailIsValid } = require("../utils/utils");
-const { createAccessToken } = require("../middlewares/utils");
+const {
+  createAccessToken,
+  verifyAccessToken,
+} = require("../middlewares/utils");
+const Goal = require("../models/GoalModel");
+const Category = require("../models/CategoryModel");
 
 /**
  * Mainly for Managers who already have a code to register on the platform
@@ -69,6 +74,7 @@ const login = async (req, res) => {
     const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
+    // And set it in cookies for 7 days as well
     res.cookie("_token", token, { maxAge: ONE_WEEK });
     return res.send(appResponse({ data: user }));
   } catch (e) {
@@ -144,9 +150,38 @@ const addStaff = async (req, res) => {
   return appResponse({ res, data: user });
 };
 
-const logout = (req, res) => {
+/**
+ * Clears out all cookies to sign user out
+ * @param {*} _
+ * @param {*} res
+ */
+const logout = (_, res) => {
   res.clearCookie("_token");
   appResponse({ res, data: "Signed out successfully!" });
+};
+
+/**
+ * Uses the access token saved in cookies to
+ * retrieve the current user that is signed in
+ * @param {*} _
+ * @param {*} res
+ */
+const whoAmI = async (req, res) => {
+  const token = verifyAccessToken(req);
+  const userId = token.payload.aud;
+
+  try {
+    const user = await User.findOne({ _id: userId });
+    const { isManager, isStaff } = getUserRoles(user);
+    var goals = [],
+      categories = [];
+    if (isStaff) goals = await Goal.find({ owner: userId }); // Retrieve all goals that were created by the stafff
+    if (isManager) categories = await Category.find(); // simply retreive all categories
+
+    appResponse({ res, data: { user, goals, categories } });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
 };
 module.exports = {
   registerManager: create,
@@ -154,4 +189,5 @@ module.exports = {
   validateStaff,
   addStaff,
   logout,
+  whoAmI,
 };

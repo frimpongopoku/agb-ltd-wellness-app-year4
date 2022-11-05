@@ -12,6 +12,7 @@ const UserSchema = new Schema(
     roles: { type: Object, default: [] },
     password: { type: String },
     verified: { type: Boolean, default: false },
+    creator : String // Will be empty for managers, but for Staff, it will have the id of the manager that created them
   },
   { timestamps: { updatedAt: true } }
 );

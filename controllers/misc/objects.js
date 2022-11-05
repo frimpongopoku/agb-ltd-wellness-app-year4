@@ -1,4 +1,5 @@
 const path = require("path");
+const { ROLES } = require("./constants");
 
 const PATH = path.join(__dirname, `../../public`);
 
@@ -30,6 +31,23 @@ const respondWithHTML = ({ status }) => {
   return path;
 };
 
+/**
+ * Deconstructs roles array and returns an object of booleans that 
+ * speficies all the roles a user occupies
+ * role object, and  
+ * @param {object} user
+ * @returns {object} 
+ */
+const getUserRoles = (user) => { 
+  if(!user) return false 
+
+  const isManager = user.roles?.find( role => role.key === ROLES.MANAGER.key)
+  const isStaff = user.roles?.find( role => role.key === ROLES.STAFF.key)
+  return { isManager, isStaff}
+}
+
 module.exports = {
   appResponse,
+  
+  getUserRoles
 };
