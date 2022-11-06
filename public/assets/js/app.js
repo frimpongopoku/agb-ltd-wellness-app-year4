@@ -2,7 +2,6 @@
 
 const signOut = document.getElementById("sign-out");
 
-console.log("This is the signout button init", signOut);
 
 signOut.addEventListener("click", function () {
   fetch("/logout", {
