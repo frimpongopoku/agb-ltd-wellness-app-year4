@@ -17,5 +17,6 @@ router.post("/category/create", create);
 router.post("/category/update", updateCategory);
 router.post("/category/delete", deleteCategory);
 router.get("/category/all", listAll);
+router.get("/category/list.mine", listAll);
 
 module.exports = router;

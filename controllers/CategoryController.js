@@ -85,10 +85,21 @@ const listAll = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+const listMine = async (req, res) => {
+  try {
+    const { context } = req.body;
+    const userId = context.aud;
+    const data = await Category.find({ creator: userId });
+    return appResponse({ res, data });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
+};
 
 module.exports = {
   create,
   updateCategory,
   deleteCategory,
   listAll,
+  listMine,
 };
