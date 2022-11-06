@@ -37,16 +37,15 @@ app.use(cookieParser());
 app.use("/", setHeaders);
 app.use("/manager", authenticatedUserIsManager);
 app.use("/staff", authenticatedUserIsStaff);
+// ---------------------------------------------------------
+app.use("/whoami", userIsAuthenticated, whoAmI);
+app.use("/logout", userIsAuthenticated, logout);
 
 //---------------- ROUTE DECLARATION ----------------------
 
 app.use("/staff", staffRoutes);
 app.use("/manager", managerRoutes);
 app.use("/", publicRoutes);
-
-// ---------------------------------------------------------
-app.use("/whoami", userIsAuthenticated, whoAmI);
-app.use("/logout", userIsAuthenticated, logout);
 
 // ------ CREATE LISTENING PORT HERE TO ENTER THE APP --------
 

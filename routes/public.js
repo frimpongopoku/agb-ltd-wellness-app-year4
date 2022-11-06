@@ -1,4 +1,5 @@
 const express = require("express");
+const { appResponse } = require("../controllers/misc/objects");
 const {
   registerManager,
   login,
@@ -26,7 +27,6 @@ router.post("/user/staff.validate", validateStaff);
 router.get("/", showLandingPage);
 router.get("/view/login", showLoginPage);
 
-
 // ------------- VIEWS THAT REQUIRE AUTHENTICATION --------------------
 router.get("/view/staff/goals", authenticatedUserIsStaff, showGoalsView);
 router.get(
@@ -34,6 +34,15 @@ router.get(
   authenticatedUserIsManager,
   showCategoriesView
 );
+
+// -----------------------------------------------------------------
+router.post("/test-response-structure", (_, res) => {
+  appResponse({
+    res,
+    data: "This is what a response object looks like. Could be string, integer, array, objects etc",
+  });
+});
+// -----------------------------------------------------------------
 router.get("*", show404);
 
 module.exports = router;
