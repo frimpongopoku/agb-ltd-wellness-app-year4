@@ -7,12 +7,27 @@
     <script src="./../../assets/js/app.js" defer></script>
     <title>AGB - CATEGORY PAGE</title>
   </head>
-  <body>
+ <body style=" padding:0px 15%">
     <div style="text-align: center">
-      <h1 style="font-size: 52px">
-        Welcome <span id="user-name" style="text-decoration: underline">...</span
+      <h1 style="font-size: 35px">
+        Welcome <span id="user-name" style="text-decoration: underline">{{user.firstName}}</span
         >, to the CATEGORIES page
       </h1>
+
+        <hr style="border-color:black">
+
+        <h4 style="text-decoration: underline">Categories you have created </h4> 
+        {{#categories}}
+          <li>{{name}} </li>
+        {{/categories}}
+
+         <h4 style="text-decoration: underline">Staff members you have added </h4> 
+        {{#staff}}
+          <li>{{email}}</li>
+        {{/staff}}
+        <br/>
+
+
 
       <button
         id="sign-out"

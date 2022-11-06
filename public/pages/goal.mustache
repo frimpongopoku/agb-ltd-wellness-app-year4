@@ -7,14 +7,25 @@
     <script src="./../../assets/js/app.js" defer></script>
     <title>AGB - GOALS PAGE</title>
   </head>
-  <body>
+  <body style=" padding:0px 15%">
     <div style="text-align: center">
-      <h1 style="font-size: 52px">
+      <h1 style="font-size: 35px">
         Welcome
-        <span id="user-name" style="text-decoration: underline">{{user.firstName}} {{user.lastName}}</span>, to
+        <span id="user-name" style="text-decoration: underline">{{user.firstName}}</span>, to
         the GOALS page
       </h1>
+      <hr style="border-color:black">
+      
+      {{#goals}}
+        <div>
+          <h3>{{title}}</h3>
+          <p>{{description}}</p>
+          <h6><b>Due By:</b> {{dueBy}} </h6>
+        </div>
+      {{/goals}}
 
+      <br/>
+      
       <button
         id="sign-out"
         style="padding: 20px 40px; font-weight: bold; cursor: pointer"

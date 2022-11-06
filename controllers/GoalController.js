@@ -7,8 +7,8 @@ const { appResponse } = require("./misc/objects");
  * @param {*} res
  */
 const create = async (req, res) => {
-  const { title, description, categories, dueBy, owner } = req.body || {};
-
+  const { title, description, categories, dueBy, context } = req.body || {};
+  const userId = context.aud;
   if (!dueBy)
     return appResponse({
       res,
@@ -27,7 +27,7 @@ const create = async (req, res) => {
       description,
       categories,
       dueBy,
-      owner,
+      owner: userId,
     });
     res.status(201).send(appResponse({ data: goal }));
   } catch (e) {

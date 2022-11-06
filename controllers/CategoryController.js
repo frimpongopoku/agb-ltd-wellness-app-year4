@@ -9,7 +9,8 @@ const { appResponse } = require("./misc/objects");
  * @returns
  */
 const create = async (req, res) => {
-  const { name, description } = req.body || {};
+  const { name, description, context } = req.body || {};
+  const userId = context.aud;
   if (!name || !description)
     return appResponse({
       res,
@@ -17,7 +18,11 @@ const create = async (req, res) => {
         "Please provide a 'name' and 'description' of the category you wish to create!",
     });
 
-  const category = await Category.create({ name, description });
+  const category = await Category.create({
+    name,
+    description,
+    creator: userId,
+  });
 
   return res.status(201).send(appResponse({ data: category, status: 201 }));
 };

@@ -12,17 +12,17 @@ const {
   showCategoriesView,
   showGoalsView,
 } = require("../controllers/ViewController");
-const {
+const { 
   authenticatedUserIsStaff,
   authenticatedUserIsManager,
 } = require("../middlewares");
-
+      
 const router = express.Router();
-
+ 
 router.post("/register/manager", registerManager);
 router.post("/user/login", login);
 router.post("/user/staff.validate", validateStaff);
-
+ 
 // ------------------ VIEWS ----------------------
 router.get("/", showLandingPage);
 router.get("/view/login", showLoginPage);

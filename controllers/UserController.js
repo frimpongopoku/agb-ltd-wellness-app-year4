@@ -120,7 +120,6 @@ const validateStaff = async (req, res) => {
       lastName,
       dob,
       password: hashedPassword,
-      roles: [ROLES.STAFF],
       verified: true,
     };
 
@@ -142,12 +141,13 @@ const validateStaff = async (req, res) => {
  * @param {*} res
  */
 const addStaff = async (req, res) => {
-  const { email } = req.body || {};
+  const { email, context } = req.body || {};
+  const userId = context.aud
 
   if (!email || !emailIsValid(email))
     return res.send(appResponse({ error: "Please enter a valid email" }));
 
-  const user = await User.create({ email });
+  const user = await User.create({ email, creator:userId, roles: [ROLES.STAFF] });
 
   if (!user)
     return appResponse({ res, error: "Sorry, we could not add staff member" });
