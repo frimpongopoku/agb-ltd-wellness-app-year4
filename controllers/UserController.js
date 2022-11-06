@@ -3,13 +3,10 @@ const { appResponse, getUserRoles } = require("./misc/objects");
 const hasher = require("bcrypt");
 const { ROLES, MANAGER_CODES, STAFF_CODES } = require("./misc/constants");
 const { emailIsValid } = require("../utils/utils");
-const {
-  createAccessToken,
-  verifyAccessToken,
-} = require("../middlewares/utils");
+const { createAccessToken } = require("../middlewares/utils");
 const Goal = require("../models/GoalModel");
 const Category = require("../models/CategoryModel");
-
+const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
 /**
  * Mainly for Managers who already have a code to register on the platform
  * @param {*} req
@@ -40,6 +37,10 @@ const create = async (req, res) => {
     });
     var withoutPassword = user.toObject();
     delete withoutPassword.password;
+    // Create an access token for 7days
+    const token = await createAccessToken(user._id?.toString(), "7d");
+    // And set it in cookies for 7 days as well
+    res.cookie("_token", token, { maxAge: ONE_WEEK });
     res.status(201).send(appResponse({ data: withoutPassword, status: 201 }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -73,7 +74,6 @@ const login = async (req, res) => {
     if (!passwordIsRight)
       return res.send(appResponse({ error: "Password is incorrect!" }));
 
-    const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
@@ -124,9 +124,10 @@ const validateStaff = async (req, res) => {
     };
 
     User.findOneAndUpdate({ email }, toUpdate, { new: true }).then(
-      (result, error) => {
+      async (result, error) => {
         if (error) return res.send(appResponse({ error }));
-
+        const token = await createAccessToken(user._id?.toString(), "7d");
+        res.cookie("_token", token, { maxAge: ONE_WEEK });
         res.send(appResponse({ data: result, status: 200 }));
       }
     );
@@ -142,12 +143,16 @@ const validateStaff = async (req, res) => {
  */
 const addStaff = async (req, res) => {
   const { email, context } = req.body || {};
-  const userId = context.aud
+  const userId = context.aud;
 
   if (!email || !emailIsValid(email))
     return res.send(appResponse({ error: "Please enter a valid email" }));
 
-  const user = await User.create({ email, creator:userId, roles: [ROLES.STAFF] });
+  const user = await User.create({
+    email,
+    creator: userId,
+    roles: [ROLES.STAFF],
+  });
 
   if (!user)
     return appResponse({ res, error: "Sorry, we could not add staff member" });
