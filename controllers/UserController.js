@@ -95,13 +95,14 @@ const login = async (req, res) => {
 const validateStaff = async (req, res) => {
   const { firstName, lastName, dob, password, email, code } = req.body || {};
   const codeIsValid = STAFF_CODES.includes(code);
-  const user = User.findOne({ email });
+
+  var user = await User.findOne({ email: email.toLowerCase() });
 
   if (!user)
     return res.send(
       appResponse({
         error:
-          "Sorry, could not find your account. Please make sure a staff has already added you!",
+          "Sorry, could not find your account. Please make sure a manager has already added you!",
       })
     );
 
@@ -126,9 +127,11 @@ const validateStaff = async (req, res) => {
     User.findOneAndUpdate({ email }, toUpdate, { new: true }).then(
       async (result, error) => {
         if (error) return res.send(appResponse({ error }));
+        const obj = result.toObject() 
+        delete obj.password
         const token = await createAccessToken(user._id?.toString(), "7d");
         res.cookie("_token", token, { maxAge: ONE_WEEK });
-        res.send(appResponse({ data: result, status: 200 }));
+        res.send(appResponse({ data: obj, status: 200 }));
       }
     );
   } catch (e) {
@@ -149,7 +152,7 @@ const addStaff = async (req, res) => {
     return res.send(appResponse({ error: "Please enter a valid email" }));
 
   const user = await User.create({
-    email,
+    email: email.toLowerCase(),
     creator: userId,
     roles: [ROLES.STAFF],
   });
