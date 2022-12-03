@@ -35,7 +35,7 @@ const create = async (req, res) => {
       roles: [ROLES.STAFF, ROLES.MANAGER],
       verified: true,
     });
-    var withoutPassword = user.toObject();
+    let withoutPassword = user.toObject();
     delete withoutPassword.password;
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
@@ -58,6 +58,7 @@ const login = async (req, res) => {
   try {
     if (!email || !password)
       return appResponse({
+        res,
         error: "Please provide a valid email and password",
       });
 
@@ -65,6 +66,7 @@ const login = async (req, res) => {
     if (!user)
       return res.status(400).send(
         appResponse({
+          res,
           status: 404,
           error: `Sorry, could not find user with email '${email}'`,
         })
@@ -78,8 +80,9 @@ const login = async (req, res) => {
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
     res.cookie("_token", token, { maxAge: ONE_WEEK });
-    var withoutPassword = user.toObject();
+    let withoutPassword = user.toObject();
     delete withoutPassword.password; // dont send the user object with password to the fronted. Remove it first
+
     return res.send(appResponse({ data: withoutPassword }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -127,8 +130,8 @@ const validateStaff = async (req, res) => {
     User.findOneAndUpdate({ email }, toUpdate, { new: true }).then(
       async (result, error) => {
         if (error) return res.send(appResponse({ error }));
-        const obj = result.toObject() 
-        delete obj.password
+        const obj = result.toObject();
+        delete obj.password;
         const token = await createAccessToken(user._id?.toString(), "7d");
         res.cookie("_token", token, { maxAge: ONE_WEEK });
         res.send(appResponse({ data: obj, status: 200 }));

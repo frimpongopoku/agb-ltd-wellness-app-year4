@@ -1,5 +1,6 @@
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const express = require("express");
 const app = express();
 const publicRoutes = require("./routes/public");
@@ -31,10 +32,17 @@ app.set("views", __dirname + "/public/pages");
 app.use(express.json());
 app.use(STATIC_PATH);
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // When deploying, change this to prod route
+    credentials: true,
+  })
+);
 
 // ---------------- DECLARING MIDDLEWARE -----------------
 
-app.use("/", setHeaders);
+// app.use("/", setHeaders);
+
 app.use("/manager", authenticatedUserIsManager);
 app.use("/staff", authenticatedUserIsStaff);
 // ---------------------------------------------------------
