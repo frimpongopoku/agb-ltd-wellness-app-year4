@@ -105,7 +105,7 @@ const validateStaff = async (req, res) => {
     return res.send(
       appResponse({
         error:
-          "Sorry, could not find your account. Please make sure a manager has already added you!",
+          " Please make sure a manager has already added you, to register!",
       })
     );
 
@@ -188,10 +188,16 @@ const whoAmI = async (req, res) => {
   try {
     const user = await User.findOne({ _id: userId }).select(["-password"]); // dont add password field when retrieving object, even though its hashed
     const { isManager, isStaff } = getUserRoles(user);
-    var goals = [],
-      categories = [];
+    let goals = [],
+      categories = [],
+      staffs = [];
     if (isStaff) goals = await Goal.find({ owner: userId }); // Retrieve all goals that were created by the stafff
-    if (isManager) categories = await Category.find(); // simply retreive all categories
+    if (isManager) {
+      categories = await Category.find(); // simply retreive all categories
+      staffs = await User.find({
+        roles: { $elemMatch: { key: ROLES.STAFF.key } },
+      }).select(["-password"]);
+    }
 
     appResponse({
       res,
@@ -203,6 +209,7 @@ const whoAmI = async (req, res) => {
         },
         goals,
         categories,
+        staffs,
       },
     });
   } catch (e) {
