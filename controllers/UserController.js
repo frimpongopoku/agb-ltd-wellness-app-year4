@@ -14,7 +14,8 @@ const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
  * @returns
  */
 const create = async (req, res) => {
-  const { firstName, lastName, dob, password, email, code } = req.body || {};
+  const { firstName, lastName, dob, password, email, code, image } =
+    req.body || {};
   const codeIsValid = MANAGER_CODES.includes(code);
 
   try {
@@ -31,6 +32,7 @@ const create = async (req, res) => {
       lastName,
       dob,
       email,
+      image,
       password: hashedPassword,
       roles: [ROLES.STAFF, ROLES.MANAGER],
       verified: true,
@@ -148,7 +150,7 @@ const validateStaff = async (req, res) => {
  * @param {*} res
  */
 const addStaff = async (req, res) => {
-  const { email, context } = req.body || {};
+  const { email, context, image, firstName } = req.body || {};
   const userId = context.aud;
 
   if (!email || !emailIsValid(email))
@@ -156,6 +158,8 @@ const addStaff = async (req, res) => {
 
   const user = await User.create({
     email: email.toLowerCase(),
+    image,
+    firstName,
     creator: userId,
     roles: [ROLES.STAFF],
   });
@@ -191,12 +195,15 @@ const whoAmI = async (req, res) => {
     let goals = [],
       categories = [],
       staffs = [];
-    if (isStaff) goals = await Goal.find({ owner: userId }); // Retrieve all goals that were created by the stafff
+    if (isStaff)
+      goals = await Goal.find({ owner: userId }).sort({ createdAt: -1 }); // Retrieve all goals that were created by the stafff
     if (isManager) {
-      categories = await Category.find(); // simply retreive all categories
+      categories = await Category.find().sort({ createdAt: -1 }); // simply retreive all categories
       staffs = await User.find({
         roles: { $elemMatch: { key: ROLES.STAFF.key } },
-      }).select(["-password"]);
+      })
+        .select(["-password"])
+        .sort({ createdAt: -1 });
     }
 
     appResponse({
