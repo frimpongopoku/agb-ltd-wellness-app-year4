@@ -47,17 +47,19 @@ const updateCategory = async (req, res) => {
     }
   );
 };
+
+
 /**
  * Allows managers to delete a category
  * @param {*} req
  * @param {*} res
  */
 const deleteCategory = async (req, res) => {
-  const { id } = req.body || {};
+  const { ids } = req.body || {};
 
   try {
-    const response = await Category.findOneAndDelete(
-      { _id: id },
+    const response = await Category.deleteMany(
+      { _id: { $in: ids } },
       { new: true }
     );
     if (!response)
@@ -72,6 +74,8 @@ const deleteCategory = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+
+
 /**
  * Allows managers to fetch all categories
  * @param {*} req
@@ -102,4 +106,5 @@ module.exports = {
   deleteCategory,
   listAll,
   listMine,
+  
 };

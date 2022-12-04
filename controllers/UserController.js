@@ -242,6 +242,33 @@ const listMyStaff = async (req, res) => {
     appResponse({ res, error: e.toString() });
   }
 };
+
+/**
+ * Allows managers to delete staff members
+ * @param {*} req
+ * @param {*} res
+ */
+const deleteStaff = async (req, res) => {
+  const { ids } = req.body || {};
+
+  try {
+    const response = await User.deleteMany(
+      { _id: { $in: ids } },
+      { new: true }
+    );
+    if (!response)
+      return appResponse({
+        res,
+        error: `Sorry, could not delete items with ids ${id}`,
+        data: response,
+      });
+
+    return appResponse({ res, data: response });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
+};
+
 module.exports = {
   registerManager: create,
   login,
@@ -250,4 +277,5 @@ module.exports = {
   logout,
   whoAmI,
   listMyStaff,
+  deleteStaff,
 };
