@@ -5,7 +5,7 @@ const ROLES = {
     description: "Any user with this role, is a staff member",
   },
   MANAGER: {
-    name: "Staff",
+    name: "Manager",
     key: "xxx-manager-uni-key-xxx",
     description: "Any user with this role, is a manager",
   },
