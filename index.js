@@ -17,8 +17,8 @@ const {
 } = require("./middlewares");
 const { logout, whoAmI } = require("./controllers/UserController");
 
-const IS_LOCAL = true; 
-const ORIGIN = IS_LOCAL ? "http://127.0.0.1:3000" : "..." // put prod react deployment link here
+const IS_LOCAL = true;
+const ORIGIN = IS_LOCAL ? "http://127.0.0.1:3000" : "..."; // put prod react deployment link here
 // --------------------------------------------------------
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 const STATIC_PATH = express.static(path.join(__dirname, "./public"));
@@ -37,16 +37,20 @@ app.use(STATIC_PATH);
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ORIGIN, // When deploying, change this to prod route
+    // origin: "http://localhost:3000", // When deploying, change this to prod route
+    // origin: "http://127.0.0.1:3000", // When deploying, change this to prod route
+    origin: ORIGIN,
     credentials: true,
   })
 );
-app.use(function(req, res, next) {  
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
-});  
-
+});
 
 // ---------------- DECLARING MIDDLEWARE -----------------
 

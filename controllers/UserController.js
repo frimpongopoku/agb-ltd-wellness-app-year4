@@ -42,7 +42,11 @@ const create = async (req, res) => {
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
-    res.cookie("_token", token, { maxAge: ONE_WEEK });
+    res.cookie("_token", token, {
+      maxAge: ONE_WEEK,
+      sameSite: "none",
+      secure: true,
+    });
     res.status(201).send(appResponse({ data: withoutPassword, status: 201 }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -81,7 +85,11 @@ const login = async (req, res) => {
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
-    res.cookie("_token", token, { maxAge: ONE_WEEK });
+    res.cookie("_token", token, {
+      maxAge: ONE_WEEK,
+      sameSite: "none",
+      secure: true,
+    });
     let withoutPassword = user.toObject();
     delete withoutPassword.password; // dont send the user object with password to the fronted. Remove it first
 
