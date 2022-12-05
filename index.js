@@ -16,6 +16,9 @@ const {
   userIsAuthenticated,
 } = require("./middlewares");
 const { logout, whoAmI } = require("./controllers/UserController");
+
+const IS_LOCAL = true; 
+const ORIGIN = IS_LOCAL ? "http://127.0.0.1:3000" : "..." // put prod react deployment link here
 // --------------------------------------------------------
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 const STATIC_PATH = express.static(path.join(__dirname, "./public"));
@@ -34,7 +37,7 @@ app.use(STATIC_PATH);
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000", // When deploying, change this to prod route
+    origin: ORIGIN, // When deploying, change this to prod route
     credentials: true,
   })
 );
