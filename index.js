@@ -18,7 +18,9 @@ const {
 const { logout, whoAmI } = require("./controllers/UserController");
 
 const IS_LOCAL = true;
-const ORIGIN = IS_LOCAL ? "http://127.0.0.1:3000" : "..."; // put prod react deployment link here
+const ORIGIN = IS_LOCAL
+  ? "http://127.0.0.1:3000"
+  : "https://agb-frontend-service.onrender.com"; // put prod react deployment link here
 // --------------------------------------------------------
 const DATABASE_CONNECTION_LINK = process.env.MONGODB_DATABSE_LINK;
 const STATIC_PATH = express.static(path.join(__dirname, "./public"));
@@ -37,7 +39,7 @@ app.use(STATIC_PATH);
 app.use(cookieParser());
 app.use(
   cors({
-     origin: ORIGIN,
+    origin: ORIGIN,
     credentials: true,
   })
 );
