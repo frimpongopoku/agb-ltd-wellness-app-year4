@@ -3,13 +3,10 @@ const { appResponse, getUserRoles } = require("./misc/objects");
 const hasher = require("bcrypt");
 const { ROLES, MANAGER_CODES, STAFF_CODES } = require("./misc/constants");
 const { emailIsValid } = require("../utils/utils");
-const {
-  createAccessToken,
-  verifyAccessToken,
-} = require("../middlewares/utils");
+const { createAccessToken } = require("../middlewares/utils");
 const Goal = require("../models/GoalModel");
 const Category = require("../models/CategoryModel");
-
+const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
 /**
  * Mainly for Managers who already have a code to register on the platform
  * @param {*} req
@@ -17,7 +14,8 @@ const Category = require("../models/CategoryModel");
  * @returns
  */
 const create = async (req, res) => {
-  const { firstName, lastName, dob, password, email, code } = req.body || {};
+  const { firstName, lastName, dob, password, email, code, image } =
+    req.body || {};
   const codeIsValid = MANAGER_CODES.includes(code);
 
   try {
@@ -34,12 +32,17 @@ const create = async (req, res) => {
       lastName,
       dob,
       email,
+      image,
       password: hashedPassword,
       roles: [ROLES.STAFF, ROLES.MANAGER],
       verified: true,
     });
-    var withoutPassword = user.toObject();
+    let withoutPassword = user.toObject();
     delete withoutPassword.password;
+    // Create an access token for 7days
+    const token = await createAccessToken(user._id?.toString(), "7d");
+    // And set it in cookies for 7 days as well
+    res.cookie("_token", token, { maxAge: ONE_WEEK });
     res.status(201).send(appResponse({ data: withoutPassword, status: 201 }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -57,6 +60,7 @@ const login = async (req, res) => {
   try {
     if (!email || !password)
       return appResponse({
+        res,
         error: "Please provide a valid email and password",
       });
 
@@ -64,6 +68,7 @@ const login = async (req, res) => {
     if (!user)
       return res.status(400).send(
         appResponse({
+          res,
           status: 404,
           error: `Sorry, could not find user with email '${email}'`,
         })
@@ -73,13 +78,13 @@ const login = async (req, res) => {
     if (!passwordIsRight)
       return res.send(appResponse({ error: "Password is incorrect!" }));
 
-    const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
     // Create an access token for 7days
     const token = await createAccessToken(user._id?.toString(), "7d");
     // And set it in cookies for 7 days as well
     res.cookie("_token", token, { maxAge: ONE_WEEK });
-    var withoutPassword = user.toObject();
+    let withoutPassword = user.toObject();
     delete withoutPassword.password; // dont send the user object with password to the fronted. Remove it first
+
     return res.send(appResponse({ data: withoutPassword }));
   } catch (e) {
     res.send(appResponse({ error: e?.toString() }));
@@ -95,13 +100,14 @@ const login = async (req, res) => {
 const validateStaff = async (req, res) => {
   const { firstName, lastName, dob, password, email, code } = req.body || {};
   const codeIsValid = STAFF_CODES.includes(code);
-  const user = User.findOne({ email });
+
+  var user = await User.findOne({ email: email.toLowerCase() });
 
   if (!user)
     return res.send(
       appResponse({
         error:
-          "Sorry, could not find your account. Please make sure a staff has already added you!",
+          " Please make sure a manager has already added you, to register!",
       })
     );
 
@@ -120,15 +126,17 @@ const validateStaff = async (req, res) => {
       lastName,
       dob,
       password: hashedPassword,
-      roles: [ROLES.STAFF],
       verified: true,
     };
 
     User.findOneAndUpdate({ email }, toUpdate, { new: true }).then(
-      (result, error) => {
+      async (result, error) => {
         if (error) return res.send(appResponse({ error }));
-
-        res.send(appResponse({ data: result, status: 200 }));
+        const obj = result.toObject();
+        delete obj.password;
+        const token = await createAccessToken(user._id?.toString(), "7d");
+        res.cookie("_token", token, { maxAge: ONE_WEEK });
+        res.send(appResponse({ data: obj, status: 200 }));
       }
     );
   } catch (e) {
@@ -142,12 +150,19 @@ const validateStaff = async (req, res) => {
  * @param {*} res
  */
 const addStaff = async (req, res) => {
-  const { email } = req.body || {};
+  const { email, context, image, firstName } = req.body || {};
+  const userId = context.aud;
 
   if (!email || !emailIsValid(email))
     return res.send(appResponse({ error: "Please enter a valid email" }));
 
-  const user = await User.create({ email });
+  const user = await User.create({
+    email: email.toLowerCase(),
+    image,
+    firstName,
+    creator: userId,
+    roles: [ROLES.STAFF],
+  });
 
   if (!user)
     return appResponse({ res, error: "Sorry, we could not add staff member" });
@@ -177,10 +192,19 @@ const whoAmI = async (req, res) => {
   try {
     const user = await User.findOne({ _id: userId }).select(["-password"]); // dont add password field when retrieving object, even though its hashed
     const { isManager, isStaff } = getUserRoles(user);
-    var goals = [],
-      categories = [];
-    if (isStaff) goals = await Goal.find({ owner: userId }); // Retrieve all goals that were created by the stafff
-    if (isManager) categories = await Category.find(); // simply retreive all categories
+    let goals = [],
+      categories = [],
+      staffs = [];
+    if (isStaff)
+      goals = await Goal.find({ owner: userId }).sort({ createdAt: -1 }); // Retrieve all goals that were created by the stafff
+    if (isManager) {
+      categories = await Category.find().sort({ createdAt: -1 }); // simply retreive all categories
+      staffs = await User.find({
+        roles: { $elemMatch: { key: ROLES.STAFF.key } },
+      })
+        .select(["-password"])
+        .sort({ createdAt: -1 });
+    }
 
     appResponse({
       res,
@@ -192,12 +216,59 @@ const whoAmI = async (req, res) => {
         },
         goals,
         categories,
+        staffs,
       },
     });
   } catch (e) {
     appResponse({ res, error: e?.toString() });
   }
 };
+
+/**
+ * Retrieves all the staff members that a particular manager has added
+ * to the platform
+ * @param {*} req
+ * @param {*} res
+ */
+const listMyStaff = async (req, res) => {
+  const { context } = req.body;
+  const userId = context.aud;
+  try {
+    const staffMembers = await User.find({ creator: userId }).select([
+      "-password",
+    ]);
+    appResponse({ res, data: staffMembers });
+  } catch (e) {
+    appResponse({ res, error: e.toString() });
+  }
+};
+
+/**
+ * Allows managers to delete staff members
+ * @param {*} req
+ * @param {*} res
+ */
+const deleteStaff = async (req, res) => {
+  const { ids } = req.body || {};
+
+  try {
+    const response = await User.deleteMany(
+      { _id: { $in: ids } },
+      { new: true }
+    );
+    if (!response)
+      return appResponse({
+        res,
+        error: `Sorry, could not delete items with ids ${id}`,
+        data: response,
+      });
+
+    return appResponse({ res, data: response });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
+};
+
 module.exports = {
   registerManager: create,
   login,
@@ -205,4 +276,6 @@ module.exports = {
   addStaff,
   logout,
   whoAmI,
+  listMyStaff,
+  deleteStaff,
 };

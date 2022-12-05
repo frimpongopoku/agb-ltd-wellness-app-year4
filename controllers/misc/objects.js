@@ -18,16 +18,20 @@ const appResponse = (params) => {
     status,
   };
   if (!res) return obj;
-  if (htmlResponse) return res.sendFile(respondWithHTML({ status }));
+  if (htmlResponse) return res.render(respondWithHTML({ status }));
   res.send(obj);
 };
 
 const respondWithHTML = ({ status }) => {
+  // const files = {
+  //   403: `${PATH}/pages/errors/403.html`,
+  //   401: `${PATH}/pages/errors/401.html`,
+  // };
   const files = {
-    403: `${PATH}/pages/errors/403.html`,
-    401: `${PATH}/pages/errors/401.html`,
+    403: `errors/403`,
+    401: `errors/401`,
   };
-  const path = files[status] || `${PATH}/pages/errors/400.html`;
+  const path = files[status] || `errors/400`;
   return path;
 };
 

@@ -9,7 +9,8 @@ const { appResponse } = require("./misc/objects");
  * @returns
  */
 const create = async (req, res) => {
-  const { name, description } = req.body || {};
+  const { name, description, context } = req.body || {};
+  const userId = context.aud;
   if (!name || !description)
     return appResponse({
       res,
@@ -17,7 +18,11 @@ const create = async (req, res) => {
         "Please provide a 'name' and 'description' of the category you wish to create!",
     });
 
-  const category = await Category.create({ name, description });
+  const category = await Category.create({
+    name,
+    description,
+    creator: userId,
+  });
 
   return res.status(201).send(appResponse({ data: category, status: 201 }));
 };
@@ -42,17 +47,19 @@ const updateCategory = async (req, res) => {
     }
   );
 };
+
+
 /**
  * Allows managers to delete a category
  * @param {*} req
  * @param {*} res
  */
 const deleteCategory = async (req, res) => {
-  const { id } = req.body || {};
+  const { ids } = req.body || {};
 
   try {
-    const response = await Category.findOneAndDelete(
-      { _id: id },
+    const response = await Category.deleteMany(
+      { _id: { $in: ids } },
       { new: true }
     );
     if (!response)
@@ -67,6 +74,8 @@ const deleteCategory = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+
+
 /**
  * Allows managers to fetch all categories
  * @param {*} req
@@ -80,10 +89,22 @@ const listAll = async (req, res) => {
     appResponse({ res, error: e?.toString() });
   }
 };
+const listMine = async (req, res) => {
+  try {
+    const { context } = req.body;
+    const userId = context.aud;
+    const data = await Category.find({ creator: userId });
+    return appResponse({ res, data });
+  } catch (e) {
+    appResponse({ res, error: e?.toString() });
+  }
+};
 
 module.exports = {
   create,
   updateCategory,
   deleteCategory,
   listAll,
+  listMine,
+  
 };

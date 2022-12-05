@@ -7,8 +7,8 @@ const { appResponse } = require("./misc/objects");
  * @param {*} res
  */
 const create = async (req, res) => {
-  const { title, description, categories, dueBy, owner } = req.body || {};
-
+  const { title, description, categories, dueBy, context } = req.body || {};
+  const userId = context.aud;
   if (!dueBy)
     return appResponse({
       res,
@@ -27,7 +27,7 @@ const create = async (req, res) => {
       description,
       categories,
       dueBy,
-      owner,
+      owner: userId,
     });
     res.status(201).send(appResponse({ data: goal }));
   } catch (e) {
@@ -70,14 +70,22 @@ const updateGoal = async (req, res) => {
  */
 
 const deleteGoal = async (req, res) => {
-  const { id } = req.body || {};
+  const { ids } = req.body || {};
 
   try {
-    const response = await Goal.findOneAndDelete({ _id: id }, { new: true });
+    const response = await Goal.deleteMany(
+      {
+        _id: {
+          $in: ids,
+        },
+      },
+      { new: true }
+    );
+
     if (!response)
       return appResponse({
         res,
-        error: `Sorry, could not delete item with id:${id}`,
+        error: `Sorry, could not delete items with id ${id}`,
         data: response,
       });
 

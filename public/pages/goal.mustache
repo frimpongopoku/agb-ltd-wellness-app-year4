@@ -5,15 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./../../assets/css/index.css" />
     <script src="./../../assets/js/app.js" defer></script>
-    <title>AGB - CATEGORY PAGE</title>
+    <title>AGB - GOALS PAGE</title>
   </head>
-  <body>
+  <body style=" padding:0px 15%">
     <div style="text-align: center">
-      <h1 style="font-size: 52px">
-        Welcome <span id="user-name" style="text-decoration: underline">...</span
-        >, to the CATEGORIES page
+      <h1 style="font-size: 35px">
+        Welcome
+        <span id="user-name" style="text-decoration: underline">{{user.firstName}}</span>, to
+        the GOALS page
       </h1>
+      <hr style="border-color:black">
+      
+      {{#goals}}
+        <div>
+          <h3>{{title}}</h3>
+          <p>{{description}}</p>
+          <h6><b>Due By:</b> {{dueBy}} </h6>
+        </div>
+      {{/goals}}
 
+      <br/>
+      
       <button
         id="sign-out"
         style="padding: 20px 40px; font-weight: bold; cursor: pointer"
