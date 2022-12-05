@@ -206,13 +206,13 @@ const whoAmI = async (req, res) => {
     if (isStaff)
       goals = await Goal.find({ owner: userId }).sort({ createdAt: -1 }); // Retrieve all goals that were created by the stafff
     if (isManager) {
-      categories = await Category.find().sort({ createdAt: -1 }); // simply retreive all categories
       staffs = await User.find({
         roles: { $elemMatch: { key: ROLES.STAFF.key } },
       })
         .select(["-password"])
         .sort({ createdAt: -1 });
     }
+    categories = await Category.find().sort({ createdAt: -1 }); // simply retreive all categories
 
     appResponse({
       res,
