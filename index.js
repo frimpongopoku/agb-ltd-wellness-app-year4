@@ -17,7 +17,7 @@ const {
 } = require("./middlewares");
 const { logout, whoAmI } = require("./controllers/UserController");
 
-const IS_LOCAL = true;
+const IS_LOCAL = false;
 const ORIGIN = IS_LOCAL
   ? "http://127.0.0.1:3000"
   : "https://agb-frontend-service.onrender.com"; // put prod react deployment link here
