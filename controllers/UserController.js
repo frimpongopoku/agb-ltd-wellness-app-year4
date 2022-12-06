@@ -214,11 +214,17 @@ const whoAmI = async (req, res) => {
     if (isStaff)
       goals = await Goal.find({ owner: userId }).sort({ createdAt: -1 }); // Retrieve all goals that were created by the stafff
     if (isManager) {
+      // Retrive all users
       staffs = await User.find({
         roles: { $elemMatch: { key: ROLES.STAFF.key } },
       })
-        .select(["-password"])
-        .sort({ createdAt: -1 });
+        .select(["-password"]) // remove the password field
+        .sort({ createdAt: -1 }); // order from the latest to the oldest
+      // Then just retrieve only staff members
+      staffs = (staffs || []).filter((staff) => {
+        const keys = staff.roles.map((r) => r.key);
+        return !keys.includes(ROLES.MANAGER.key);
+      });
     }
     categories = await Category.find().sort({ createdAt: -1 }); // simply retreive all categories
 
