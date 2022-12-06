@@ -143,7 +143,11 @@ const validateStaff = async (req, res) => {
         const obj = result.toObject();
         delete obj.password;
         const token = await createAccessToken(user._id?.toString(), "7d");
-        res.cookie("_token", token, { maxAge: ONE_WEEK });
+        res.cookie("_token", token, {
+          maxAge: ONE_WEEK,
+          sameSite: "none",
+          secure: true,
+        });
         res.send(appResponse({ data: obj, status: 200 }));
       }
     );
@@ -183,7 +187,11 @@ const addStaff = async (req, res) => {
  * @param {*} res
  */
 const logout = (_, res) => {
-  res.clearCookie("_token");
+  res.cookie("_token", "", {
+    maxAge: 0,
+    sameSite: "none",
+    secure: true,
+  });
   appResponse({ res, data: "Signed out successfully!" });
 };
 

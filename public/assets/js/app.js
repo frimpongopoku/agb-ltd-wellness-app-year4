@@ -10,7 +10,6 @@ signOut.addEventListener("click", function () {
   })
     .then((response) => response.json())
     .then((response) => {
-      console.log("RESPONSNE OBJECT: ", response);
       if (!response.success) return console.log("API ERROR: ", response.error);
 
       window.location = "/view/login";
