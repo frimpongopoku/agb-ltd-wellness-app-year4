@@ -12,7 +12,6 @@ const { connectToMongoDB } = require("./utils/utils");
 const {
   authenticatedUserIsManager,
   authenticatedUserIsStaff,
-  setHeaders,
   userIsAuthenticated,
 } = require("./middlewares");
 const { logout, whoAmI } = require("./controllers/UserController");
